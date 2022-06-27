@@ -8,17 +8,21 @@ import Context from "../../utils/Context";
 import Storage from "../../utils/Storage";
 
 const LoginScreen = () => {
-  const { setToken } = useContext(Context);
+  const { setToken, setOn } = useContext(Context);
+
+  async function login() {
+    if (!(await Storage.GetOnBoarding())) {
+      setOn(false);
+    }
+
+    await Storage.SetOnToken("12345");
+    setToken(true);
+  }
+
   return (
     <AppView>
       <TextMediumNormal>Login</TextMediumNormal>
-      <Button
-        title="Login"
-        onPress={async () => {
-          await Storage.SetOnToken("12345");
-          setToken(true);
-        }}
-      />
+      <Button title="Login" onPress={login} />
     </AppView>
   );
 };

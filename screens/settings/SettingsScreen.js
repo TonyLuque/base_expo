@@ -7,7 +7,7 @@ import TextMediumNormal from "../../components/font/TextMediumNormal";
 import Context from "../../utils/Context";
 import Storage from "../../utils/Storage";
 
-const LoginScreen = () => {
+const SettingsScreen = () => {
   const { setToken, setOn } = useContext(Context);
   return (
     <AppView>
@@ -30,6 +30,6 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default SettingsScreen;
 
 const styles = StyleSheet.create({});
