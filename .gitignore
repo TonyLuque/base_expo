@@ -1,3 +1,7 @@
+# expo
+.expo
+google-services.json
+
 # Logs
 logs
 *.log
