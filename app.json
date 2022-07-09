@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "base_expo",
-    "slug": "base_expo",
+    "slug": "pruebas",
+    "owner": "kasuru",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "enabled": true
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -23,7 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.brothersofdestruction.primerita"
+      "package": "com.brothersofdestruction.primerita",
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

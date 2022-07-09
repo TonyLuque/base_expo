@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Image } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -64,6 +64,7 @@ export default function App() {
         onLayout={onLayoutRootView}
       >
         <Text>SplashScreen Demo! 👋</Text>
+        <Image source={require("./assets/pulpi.gif")} />
       </View>
     );
   }
