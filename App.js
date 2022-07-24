@@ -1,9 +1,18 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, View, Image } from "react-native";
 
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink,
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+
+import { BASE_URL_GRAPHQL } from "@env";
+import { expirationDate } from "./utils/decodeJWT";
+
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import OnBoardingNavigation from "./navigation/OnBoardingNavigation";
 import TabNavigator from "./navigation/TabNavigator";
 import Context from "./utils/Context";
@@ -11,12 +20,11 @@ import Storage from "./utils/Storage";
 import * as SplashScreen from "expo-splash-screen";
 import LoginNavigation from "./navigation/LoginNavigation";
 
-const Stack = createNativeStackNavigator();
-
 export default function App() {
   const [on, setOn] = useState();
-  const [token, setToken] = useState();
+  const [token, setToken] = useState(null);
   const [isReady, setIsReady] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     async function prepare() {
@@ -29,6 +37,9 @@ export default function App() {
         const token = await Storage.GetOnToken();
         if (token) {
           setToken(token);
+
+          const payload = await expirationDate(setToken);
+          setUserData(payload);
         }
         // Keep the splash screen visible while we fetch resources
         await SplashScreen.preventAutoHideAsync();
@@ -45,6 +56,27 @@ export default function App() {
 
     prepare();
   }, []);
+
+  const httpLink = createHttpLink({
+    uri: BASE_URL_GRAPHQL,
+  });
+
+  const authLink = setContext(async (_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    const token = await Storage.GetOnToken();
+    // return the headers to the context so httpLink can read them
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    };
+  });
+
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
 
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
@@ -70,16 +102,18 @@ export default function App() {
   }
 
   return (
-    <Context.Provider value={{ on, setOn, token, setToken }}>
-      <NavigationContainer>
-        {!token ? (
-          <LoginNavigation />
-        ) : token && on ? (
-          <TabNavigator />
-        ) : (
-          <OnBoardingNavigation />
-        )}
-      </NavigationContainer>
-    </Context.Provider>
+    <ApolloProvider client={client}>
+      <Context.Provider value={{ on, setOn, token, setToken, userData }}>
+        <NavigationContainer>
+          {!token ? (
+            <LoginNavigation />
+          ) : token && on ? (
+            <TabNavigator />
+          ) : (
+            <OnBoardingNavigation />
+          )}
+        </NavigationContainer>
+      </Context.Provider>
+    </ApolloProvider>
   );
 }
