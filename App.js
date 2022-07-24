@@ -20,6 +20,8 @@ import Storage from "./utils/Storage";
 import * as SplashScreen from "expo-splash-screen";
 import LoginNavigation from "./navigation/LoginNavigation";
 
+import { RootSiblingParent } from "react-native-root-siblings";
+
 export default function App() {
   const [on, setOn] = useState();
   const [token, setToken] = useState(null);
@@ -46,8 +48,8 @@ export default function App() {
         // Artificially delay for two seconds to simulate a slow loading
         // experience. Please remove this if you copy and paste the code!
         await new Promise((resolve) => setTimeout(resolve, 4000));
-      } catch (e) {
-        console.warn(e);
+      } catch (error) {
+        console.error(error);
       } finally {
         // Tell the application to render
         setIsReady(true);
@@ -104,15 +106,17 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <Context.Provider value={{ on, setOn, token, setToken, userData }}>
-        <NavigationContainer>
-          {!token ? (
-            <LoginNavigation />
-          ) : token && on ? (
-            <TabNavigator />
-          ) : (
-            <OnBoardingNavigation />
-          )}
-        </NavigationContainer>
+        <RootSiblingParent>
+          <NavigationContainer>
+            {!token ? (
+              <LoginNavigation />
+            ) : token && on ? (
+              <TabNavigator />
+            ) : (
+              <OnBoardingNavigation />
+            )}
+          </NavigationContainer>
+        </RootSiblingParent>
       </Context.Provider>
     </ApolloProvider>
   );

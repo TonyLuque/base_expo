@@ -8,6 +8,7 @@ import Context from "../../utils/Context";
 import Storage from "../../utils/Storage";
 import { postData } from "../../utils/FetchData";
 import AppTextInput from "../../components/textInputs/TextInput";
+import { useToastError } from "../../hooks/useToastError";
 
 const LoginScreen = () => {
   const { setToken, setOn } = useContext(Context);
@@ -41,6 +42,8 @@ const LoginScreen = () => {
       setToken(true);
     } catch (error) {
       console.error(error);
+
+      useToastError(error.message);
     }
   }
 
