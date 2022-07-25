@@ -1,55 +1,39 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import AppView from "../../components/AppView";
 import Button from "../../components/buttons/Button";
 import TextMediumNormal from "../../components/font/TextMediumNormal";
-import * as Notifications from "expo-notifications";
-import Context from "../../utils/Context";
 import Storage from "../../utils/Storage";
 import { postData } from "../../utils/FetchData";
 import AppTextInput from "../../components/textInputs/TextInput";
 import { useToastError } from "../../hooks/useToastError";
 
-const LoginScreen = ({ navigation }) => {
-  const { setToken, setOn } = useContext(Context);
-  const [getDeviceId, setDeviceId] = useState();
+const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      const deviceId = (await Notifications.getDevicePushTokenAsync()).data;
-      setDeviceId(deviceId);
-    })();
-  }, []);
-
-  async function login(email, password) {
+  async function signUp(email, password) {
     try {
       const data = await postData({
-        urlPath: "/user/login",
+        urlPath: "/user/signup",
         body: {
           email: email,
           password: password,
-          deviceId: getDeviceId,
         },
       });
 
-      if (!(await Storage.GetOnBoarding())) {
-        setOn(false);
+      if (data) {
+        navigation.navigate("signUpSuccess");
       }
-
-      await Storage.SetOnToken(data);
-      setToken(true);
     } catch (error) {
       console.error(error);
-
       useToastError(error.message);
     }
   }
 
   return (
     <AppView>
-      <TextMediumNormal>Login</TextMediumNormal>
+      <TextMediumNormal>Crear Cuenta</TextMediumNormal>
       <AppTextInput
         label="Email"
         onChangeText={setEmail}
@@ -64,17 +48,11 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Password"
         secureTextEntry={true}
       />
-      <Button title="Login" onPress={() => login(email, password)} />
-      <TextMediumNormal onPress={() => navigation.navigate("signup")}>
-        Crear cuenta
-      </TextMediumNormal>
-      <TextMediumNormal onPress={() => navigation.navigate("recoveryPassword")}>
-        Olvide mi contraseña
-      </TextMediumNormal>
+      <Button title="Sign Up" onPress={() => signUp(email, password)} />
     </AppView>
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({});
